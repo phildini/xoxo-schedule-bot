@@ -12,6 +12,7 @@ def toot():
     check_time = os.getenv('CHECK_TIME')
     window = int(os.getenv('WINDOW', 10))
     visibility = visibility = os.getenv('VISIBILITY', 'direct')
+    access_token = os.getenv('ACCESS_TOKEN')
     schedule = requests.get('https://2018.xoxofest.com/api/events.json')
     events_to_toot = find_events(
         schedule=schedule.json(),
@@ -20,7 +21,7 @@ def toot():
         window=window,
     )
     client = Mastodon(
-        access_token='de532de78cfa5f758cf00b264468269b836fb4950ab521a09cffa541dfe65fb9',
+        access_token=access_token,
         api_base_url='https://xoxo.zone',
     )
     for toot in events_to_toot:
