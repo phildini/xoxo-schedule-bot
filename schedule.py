@@ -52,7 +52,12 @@ def find_events(schedule, current_day, check_time, window):
                 ),
             )
             if event.get('lineup'):
-                for lineup_event in event['lineup']:
+                check_subevents = True
+                lineup_events = event['lineup']
+                if current_day in event['lineup']:
+                    lineup_events = event['lineup'][current_day]
+                    check_subevents = False
+                for lineup_event in lineup_events:
                     venue = lineup_event.get('location', event.get('venue'))
                     start_time = lineup_event.get('start')
                     if start_time:
@@ -67,21 +72,21 @@ def find_events(schedule, current_day, check_time, window):
                                 '',
                             )
                         )
-            if event.get('lineup', [{}])[0].get('subevents'):
-                for lineup_event in event['lineup'][0]['subevents']:
-                    venue = lineup_event.get('location', event.get('venue'))
-                    start_time = lineup_event.get('start', current_day_event.get('start'))
-                    events_to_toot.append(
-                        parse_event(
-                            lineup_event,
-                            current,
-                            window,
-                            lineup_event['name'],
-                            venue,
-                            start_time,
-                            " meetup",
+                if check_subevents and lineup_events[0].get('subevents'):
+                    for lineup_event in event['lineup'][0]['subevents']:
+                        venue = lineup_event.get('location', event.get('venue'))
+                        start_time = lineup_event.get('start', current_day_event.get('start'))
+                        events_to_toot.append(
+                            parse_event(
+                                lineup_event,
+                                current,
+                                window,
+                                lineup_event['name'],
+                                venue,
+                                start_time,
+                                " meetup",
+                            )
                         )
-                    )
     events_to_toot = [toot for toot in events_to_toot if toot is not None]
     return events_to_toot
 
